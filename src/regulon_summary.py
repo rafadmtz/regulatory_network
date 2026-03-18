@@ -10,20 +10,39 @@ interactions = [
 
 
 
-
+# Extraemos los TFs unicos de las interacciones para construir el regulon
 tfs=[TF for TF, gene, effect in interactions]
 
+
+
+
+# Creamos un diccionario para almacenar el regulon, donde cada TF es una clave y su valor es una lista de tuplas (gene, effect)
 regulon = {tf: [] for tf in tfs}  
 
 
+
+
+
+# Llenamos el regulon con las interacciones correspondientes
 for tf, gene, effect in interactions:
     regulon[tf].append((gene, effect))
     
 
+
+
+# Imprimimos la estructura del regulon y el resumen de cada TF
 print("Estructura del regulon:")
 print(regulon)
 print()
 
+
+
+
+
+
+# Para cada TF en el regulon, contamos el total de genes regulados
+# Además, contamos cuántos genes son activados y cuántos son reprimidos
+# Finalmente, clasificamos el tipo de regulación (activador, represor o dual) y mostramos un resumen para cada TF. 
 for tf in regulon:
     total_genes = len(regulon[tf])
     
