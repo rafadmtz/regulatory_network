@@ -1,0 +1,7 @@
+# Caso adicional - combinacion de los tres TFs principales
+# Formato: TF gene effect
+AraC araA +
+AraC araB -
+LexA recA -
+CRP lacZ +
+CRP lacY +

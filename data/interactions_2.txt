@@ -1,0 +1,5 @@
+# Caso de prueba 2 - TF activador puro
+# Formato: TF gene effect
+CRP lacZ +
+CRP lacY +
+CRP lacA +

@@ -1,0 +1,5 @@
+# Caso de prueba 1 - TF dual y represor
+# Formato: TF gene effect
+AraC araA +
+AraC araB -
+LexA recA -

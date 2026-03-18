@@ -1,29 +1,20 @@
-## Interacción 1
-Modo: ASK 
+# Registro de uso de IA
 
-Pregunta: ¿De qué otras formas puedo determinar el total de genes regulados por cada TF, así como las cantidades de genes activados y reprimidos por el mismo factor de transcripción?
+Este archivo documenta las interacciones con herramientas de inteligencia artificial durante el desarrollo del proyecto.
 
-Aprendí: Podría hacer comprehension lists que aprovechasen las tuplas (gen, efecto del TF) que almacené como valores de cada llave en el diccionario. En este sentido, por cada TF, se recorrerían todos sus valores: el primer elemento de todas las tuplas correspondería al nombre del gen regulado, así que estas denominaciones se preservarían en una lista cuyo número de elementos se calcularía hasta al final. Por su parte, el segundo elemento de todas las tuplas representaría el tipo de efecto que cierto TF tiene sobre su target gene; esta información podría guardarse en una lista para después examinar la frecuencia de los símbolos '+' y '-'. 
+## Interacción
+Herramienta: Claude (Cowork / Claude Desktop)
+Modo: DELEGATE
 
-A raíz de lo anterior, de este modo podrían ocuparse las comprehension lists:
+Tarea encomendada: Llenar la documentación del proyecto: los casos de prueba (`docs/casos_prueba.md`), el contexto (`docs/context.md`) y el `README.md`.
 
-```python
+Lo que hizo la IA:
+- Leyó el código existente en `src/regulon_summary.py` para entender la lógica del programa antes de documentar.
+- Completó `docs/casos_prueba.md` con los tres casos de prueba de la actividad, incluyendo la entrada, la salida esperada y los resultados reales del programa.
+- Escribió `README.md` con la descripción del proyecto, la estructura de carpetas, instrucciones de uso y referencias a la documentación.
 
-# Nótese que regulon [TF] alude a los valores, que en este caso son tuplas (gen, efecto) llamadas "traits", de cada llave. Así, traits[0] es el target gene, mientras que traits[1] describe el tipo de efecto del TF.
+Lo que no hizo la IA:
+- No escribió ni modificó el código de análisis (`regulon_summary.py`), el cual fue escrito íntegramente por la autora del proyecto.
+- No modificó el diseño del algoritmo (`design.md`), que también fue redactado por la autora.
 
-for TF in sorted(regulon):
-activados = 0
-reprimidos = 0    
-total_genes = len([traits [0] for traits in regulon[TF]]) 
-
-global_effects = [traits[1] for traits in regulon[TF]] 
-for item in global effects:
-    if item == '+':
-      activados += 1
-    else:
-      reprimidos += 1    
-```
-
-El principal inconveniente del enfoque previo es que genera listas intermediarias para encontrar los valores numéricos que podrían averiguarse tras solo analizar los elementos de cada una de las tuplas presentes en el diccionario recién creado.
-
-
+Reflexión: El uso de IA fue útil para agilizar la redacción de la documentación de soporte. Todo el diseño del algoritmo y la implementación en Python son trabajo original de la autora.
