@@ -15,6 +15,6 @@ Lo que hizo la IA:
 
 Lo que no hizo la IA:
 - No escribió ni modificó el código de análisis (`regulon_summary.py`), el cual fue escrito íntegramente por la autora del proyecto.
-- No modificó el diseño del algoritmo (`design.md`), que también fue redactado por la autora.
+- No modificó el diseño del algoritmo (`design.md`), que también fue redactado por el autor.
 
-Reflexión: El uso de IA fue útil para agilizar la redacción de la documentación de soporte. Todo el diseño del algoritmo y la implementación en Python son trabajo original de la autora.
+
