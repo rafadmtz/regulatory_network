@@ -69,11 +69,11 @@ for tf in regulon:
         tipo_regulacion = "Repressor"
 
     print(f"TF: {tf}")
+    print(f"Genes regulados: {regulon[tf]}")
     print(f"Total genes regulados: {total_genes}")
     print(f"Genes activados: {genes_activados}")
     print(f"Genes reprimidos: {genes_reprimidos}")
     print(f"Tipo de regulacion: {tipo_regulacion}")
     print()
-    
 
 
