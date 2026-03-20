@@ -68,6 +68,8 @@ for tf in regulon:
     elif genes_reprimidos:
         tipo_regulacion = "Repressor"
 
+
+
     print(f"TF: {tf}")
     print(f"Genes regulados: {regulon[tf]}")
     print(f"Total genes regulados: {total_genes}")
