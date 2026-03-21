@@ -11,7 +11,7 @@ def convertir_tsv_a_csv():
             if not line.startswith("#"):
                 f_out.write(line.replace("\t", ","))
         
-
+convertir_tsv_a_csv()
 
 
 df= pd.read_csv("data/NetworkRegulatorGene_clean.csv")
@@ -40,10 +40,11 @@ for index, regulador, regulado, efecto in regulon_df.itertuples(index=True):
     if pd.isna(regulado):
         print(f"Advertencia: Gen regulado faltante en la fila {index}")
     
-    if pd.isna(efecto) or efecto not in ["+", "-", "-+"]:
-        print(f"Advertencia: Efecto invalido en la fila {index}")
+    if pd.isna(efecto):
+        print(f"Advertencia: Efecto faltante en la fila {index}, para el regulador {regulador} y el gen {regulado}")
+    elif efecto not in ["+", "-", "-+"]:
+        print(f"Advertencia: Valor invalido en la fila {index}: {efecto}, para el regulador {regulador} y el gen {regulado}")
         
-
 
 
 
