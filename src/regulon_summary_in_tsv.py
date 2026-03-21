@@ -1,11 +1,26 @@
 import pandas as pd
+import os
+
+
+filename = "data/raw/NetworkRegulatorGene.tsv"
+
+
+if not os.path.exists(filename):
+    print(f"Error: archivo no encontrado {filename}")
+    exit(1)
+
+
+
+output_file = "results/regulon_summary.tsv"
+os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
 
 
 
 #Creae un archivo csv filtrado
 
 def convertir_tsv_a_csv():
-    with open("data/raw/NetworkRegulatorGene.tsv") as f_in, \
+    with open(filename) as f_in, \
          open("data/NetworkRegulatorGene_clean.csv", "w") as f_out:
         for line in f_in:
             if not line.startswith("#"):
@@ -122,5 +137,10 @@ df_regulon = pd.DataFrame(
 
 
 
-df_regulon.to_csv("data/regulon_summary.csv", index=False)
+df_regulon = df_regulon.sort_values("Total genes regulados", ascending=False)
+
+
+
+
+df_regulon.to_csv("results/regulon_summary.csv", index=False)
     
