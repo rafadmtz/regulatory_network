@@ -25,14 +25,10 @@ regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
 
 
 
-print (regulon_df.head())
+regulon_df=regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
 
 
 
-print(regulon_df["6)function"].unique())
-
-
-print(regulon_df[regulon_df["6)function"].isna()])
 
 
 
@@ -42,21 +38,18 @@ for index, regulador, regulado, efecto in regulon_df.itertuples(index=True):
         print(f"Advertencia: Regulador faltante en la fila {index}")
     
     if pd.isna(regulado):
-        print(f"Advertencia: Regulado faltante en la fila {index}")
+        print(f"Advertencia: Gen regulado faltante en la fila {index}")
     
-    if pd.isna(efecto):
-        print(f"Advertencia: Efecto faltante en la fila {index}")
-    
-    
-    if efecto not in ["+", "-", "-+"]:
-        print(f"Advertencia: Efecto inválido en la fila {index}")
+    if pd.isna(efecto) or efecto not in ["+", "-", "-+"]:
+        print(f"Advertencia: Efecto invalido en la fila {index}")
         
 
 
 
 
 
-regulon_df=regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
+
+
 
 
 
@@ -64,7 +57,10 @@ transcription_factors = regulon_df["TF"].unique()
 
 
 
+
 tabla_resumen = []
+
+
 
 
 for tf in transcription_factors:
@@ -72,8 +68,18 @@ for tf in transcription_factors:
     
     tf_df = regulon_df[regulon_df["TF"] == tf]
     
+    
+
+    
+    
+    
     activated = (tf_df["Effect"] == "+").sum()
     repressed  = (tf_df["Effect"] == "-").sum()
+    dual = (tf_df["Effect"] == "-+").sum()
+    
+    
+    
+    
     
     if activated and repressed:
         tipo = "Dual"
@@ -82,18 +88,22 @@ for tf in transcription_factors:
     elif repressed:
         tipo = "Repressor"
     
-    genes = tf_df["Gene"].tolist()
+    
+    
+    genes = tf_df["Gene"].unique().tolist()
+    
     
     
     tabla_resumen.append((
         tf,
         len(genes),
-        activated,
-        repressed,
+        activated+dual,
+        repressed+dual,
         tipo,
         genes
     ))
     
+
 
 
 df_regulon = pd.DataFrame(
