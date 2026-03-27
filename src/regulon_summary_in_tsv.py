@@ -47,21 +47,57 @@ def validar_datos(regulon_df):
     
     tabla_errores = []
     
-    for index, regulador, regulado, efecto in regulon_df.itertuples(index=True):
+    no_effect = regulon_df[regulon_df["Effect"].isna()]
+
+    if not no_effect.empty:
+        for index, row in no_effect.iterrows():
+            tabla_errores.append((
+                index,
+                row["TF"],
+                row["Gene"],
+                row["Effect"],
+                "Efecto faltante"
+            ))
     
-        if pd.isna(regulador):
-            tabla_errores.append((index, regulador, regulado, efecto, "Regulador faltante"))
     
-        if pd.isna(regulado):
-            tabla_errores.append((index, regulador, regulado, efecto, "Gen regulado faltante"))
-    
-        if pd.isna(efecto):
-            tabla_errores.append((index, regulador, regulado, efecto, "Efecto faltante"))
+    invalid_effects = regulon_df[~regulon_df["Effect"].isin(["+", "-", "-+", None])]
         
-        elif efecto not in ["+", "-", "-+"]:
-            tabla_errores.append((index, regulador, regulado, efecto, "Valor invalido"))
-          
-            
+    if not invalid_effects.empty:
+        for index, row in invalid_effects.iterrows():
+            tabla_errores.append((
+                index,
+                row["TF"],
+                row["Gene"],
+                row["Effect"],
+                "Efecto inválido"
+            ))
+        
+    no_regulador = regulon_df[regulon_df["TF"].isna()]
+        
+    if not no_regulador.empty:
+        for index, row in no_regulador.iterrows():
+            tabla_errores.append((
+                index,
+                row["TF"],
+                row["Gene"],
+                row["Effect"],
+                "Regulador faltante"
+            ))
+        
+        
+    no_regulados = regulon_df[regulon_df["Gene"].isna()]
+        
+    if not no_regulados.empty:
+        for index, row in no_regulados.iterrows():
+            tabla_errores.append((
+                index,
+                row["TF"],
+                row["Gene"],
+                row["Effect"],
+                "Gen regulado faltante"
+            ))
+
+
         # Verificar si se encontraron errores
     if tabla_errores:
         print(f"Total de errores encontrados: {len(tabla_errores)}")
@@ -80,7 +116,10 @@ def validar_datos(regulon_df):
         print("No se encontraron errores en los datos.")
 
 
+
+
 validar_datos(regulon_df)
+
 
 
 
