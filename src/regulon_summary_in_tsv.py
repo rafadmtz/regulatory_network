@@ -47,8 +47,8 @@ def validar_datos(regulon_df):
     
     tabla_errores = []
     
+    #Verificar que no haya valores faltantes en la columna "Effect"
     no_effect = regulon_df[regulon_df["Effect"].isna()]
-
     if not no_effect.empty:
         for index, row in no_effect.iterrows():
             tabla_errores.append((
@@ -60,8 +60,8 @@ def validar_datos(regulon_df):
             ))
     
     
+    #Verificar que los valores en la columna "Effect" sean válidos
     invalid_effects = regulon_df[~regulon_df["Effect"].isin(["+", "-", "-+", None])]
-        
     if not invalid_effects.empty:
         for index, row in invalid_effects.iterrows():
             tabla_errores.append((
@@ -71,9 +71,10 @@ def validar_datos(regulon_df):
                 row["Effect"],
                 "Efecto inválido"
             ))
-        
-    no_regulador = regulon_df[regulon_df["TF"].isna()]
-        
+    
+    
+    #Verificar que no haya valores faltantes en la columna "TF"
+    no_regulador = regulon_df[regulon_df["TF"].isna()]    
     if not no_regulador.empty:
         for index, row in no_regulador.iterrows():
             tabla_errores.append((
@@ -85,8 +86,8 @@ def validar_datos(regulon_df):
             ))
         
         
+    #Verificar que no haya valores faltantes en la columna "Gene"
     no_regulados = regulon_df[regulon_df["Gene"].isna()]
-        
     if not no_regulados.empty:
         for index, row in no_regulados.iterrows():
             tabla_errores.append((
@@ -115,11 +116,12 @@ def validar_datos(regulon_df):
     else:
         print("No se encontraron errores en los datos.")
 
+    return tabla_errores
 
 
 
+# Validar los datos y reportar cualquier inconsistencia mediante la funcion validar_datos
 validar_datos(regulon_df)
-
 
 
 
@@ -165,6 +167,7 @@ def calcular_resumen_regulon(regulon_df, transcription_factors):
 
 
 tabla_resumen = calcular_resumen_regulon(regulon_df, transcription_factors)
+
 
 # Crear un DataFrame a partir de la tabla resumen
 df_regulon = pd.DataFrame(
