@@ -1,52 +1,23 @@
 import pandas as pd
 import os
-
-
-filename = "data/raw/NetworkRegulatorGene.tsv"
-
-
-# Verificar si el archivo existe
-if not os.path.exists(filename):
-    print(f"Error: archivo no encontrado {filename}")
-    exit(1)
-
-
-# Crear el directorio de resultados si no existe
-output_file = "results/regulon_summary.tsv"
-os.makedirs(os.path.dirname(output_file), exist_ok=True)
-
-
+import sys
 
 #Creae un archivo csv filtrado
-def convertir_tsv_a_csv():
+def convertir_tsv_a_csv(filename):
     with open(filename) as f_in, \
          open("data/NetworkRegulatorGene_clean.csv", "w") as f_out:
         for line in f_in:
             if not line.startswith("#"):
                 f_out.write(line.replace("\t", ","))
-        
-convertir_tsv_a_csv()
-
-
-
-# Cargar el archivo CSV filtrado
-df= pd.read_csv("data/NetworkRegulatorGene_clean.csv")
-
-
-# Seleccionar solo las columnas relevantes
-regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
-regulon_df=regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
-
-
 
 
 
 # Validar los datos y reportar cualquier inconsistencia
 
 def validar_datos(regulon_df):
-    
+
     tabla_errores = []
-    
+
     #Verificar que no haya valores faltantes en la columna "Effect"
     no_effect = regulon_df[regulon_df["Effect"].isna()]
     if not no_effect.empty:
@@ -58,8 +29,8 @@ def validar_datos(regulon_df):
                 row["Effect"],
                 "Efecto faltante"
             ))
-    
-    
+
+
     #Verificar que los valores en la columna "Effect" sean válidos
     invalid_effects = regulon_df[~regulon_df["Effect"].isin(["+", "-", "-+", None])]
     if not invalid_effects.empty:
@@ -71,10 +42,10 @@ def validar_datos(regulon_df):
                 row["Effect"],
                 "Efecto inválido"
             ))
-    
-    
+
+
     #Verificar que no haya valores faltantes en la columna "TF"
-    no_regulador = regulon_df[regulon_df["TF"].isna()]    
+    no_regulador = regulon_df[regulon_df["TF"].isna()]
     if not no_regulador.empty:
         for index, row in no_regulador.iterrows():
             tabla_errores.append((
@@ -84,8 +55,8 @@ def validar_datos(regulon_df):
                 row["Effect"],
                 "Regulador faltante"
             ))
-        
-        
+
+
     #Verificar que no haya valores faltantes en la columna "Gene"
     no_regulados = regulon_df[regulon_df["Gene"].isna()]
     if not no_regulados.empty:
@@ -103,16 +74,16 @@ def validar_datos(regulon_df):
     if tabla_errores:
         print(f"Total de errores encontrados: {len(tabla_errores)}")
         print("Ver results/regulon_errors.csv para detalles.")
-        
+
         # Crear un DataFrame para los errores encontrados
         errores_df = pd.DataFrame(
         tabla_errores,
         columns=["Index", "Regulador", "Gen regulado", "Efecto", "Error"]
         )
-        
+
         # Guardar la tabla de errores en un archivo CSV
         errores_df.to_csv("results/regulon_errors.csv", index=False)
-        
+
     else:
         print("No se encontraron errores en los datos.")
 
@@ -120,40 +91,30 @@ def validar_datos(regulon_df):
 
 
 
-# Validar los datos y reportar cualquier inconsistencia mediante la funcion validar_datos
-validar_datos(regulon_df)
-
-
-
-# Obtener la lista de reguladores únicos
-transcription_factors = regulon_df["TF"].unique()
-
-
-
 # Iterar sobre cada regulador y calcular el número de genes regulados, activados, reprimidos y el tipo de regulación
 def calcular_resumen_regulon(regulon_df, transcription_factors):
-    
-    
+
+
     tabla_resumen = []
-    
+
     for tf in transcription_factors:
         tf_df = regulon_df[regulon_df["TF"] == tf]
 
         activated = (tf_df["Effect"] == "+").sum()
         repressed  = (tf_df["Effect"] == "-").sum()
         dual = (tf_df["Effect"] == "-+").sum()
-    
-    
+
+
         if activated and repressed:
             tipo = "Dual"
         elif activated:
             tipo = "Activator"
         elif repressed:
             tipo = "Repressor"
-    
-    
+
+
         genes = tf_df["Gene"].unique().tolist()
-    
+
         tabla_resumen.append((
             tf,
             len(genes),
@@ -162,32 +123,69 @@ def calcular_resumen_regulon(regulon_df, transcription_factors):
             tipo,
             genes
         ))
-    
+
     return tabla_resumen
 
 
-tabla_resumen = calcular_resumen_regulon(regulon_df, transcription_factors)
+def main():
+    
+    """_summary_
+    
+    """
+    
+    filename = sys.argv[1]
+    output_file = sys.argv[2]
+    
+    if len(sys.argv) < 3:
+        print("Uso: python script.py <input.tsv> <output.tsv>")
+        exit(1)
+    
+    # Verificar si el archivo existe
+    if not os.path.exists(filename):
+        print(f"Error: archivo no encontrado {filename}")
+        exit(1)
+
+    # Crear el directorio de resultados si no existe"
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+    convertir_tsv_a_csv(filename)
+
+    # Cargar el archivo CSV filtrado
+    df = pd.read_csv("data/NetworkRegulatorGene_clean.csv")
+
+    # Seleccionar solo las columnas relevantes
+    regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
+    regulon_df = regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
+
+    # Validar los datos y reportar cualquier inconsistencia mediante la funcion validar_datos
+    validar_datos(regulon_df)
+
+    # Obtener la lista de reguladores únicos
+    transcription_factors = regulon_df["TF"].unique()
+
+    tabla_resumen = calcular_resumen_regulon(regulon_df, transcription_factors)
+
+    # Crear un DataFrame a partir de la tabla resumen
+    df_regulon = pd.DataFrame(
+        tabla_resumen,
+        columns=[
+            "TF",
+            "Total genes regulados",
+            "Total genes activados",
+            "Total genes reprimidos",
+            "Tipo de regulacion",
+            "Genes regulados"
+        ]
+    )
+
+    # Ordenar el DataFrame por el número total de genes regulados
+    df_regulon = df_regulon.sort_values("Total genes regulados", ascending=False)
+
+    # Guardar el resumen en un archivo CSV
+    df_regulon.to_csv(output_file, index=False)
+
+    print(f"\nResumen de regulones generado exitosamente. Ver {output_file} para detalles.")
 
 
-# Crear un DataFrame a partir de la tabla resumen
-df_regulon = pd.DataFrame(
-    tabla_resumen,
-    columns=[
-        "TF",
-        "Total genes regulados",
-        "Total genes activados",
-        "Total genes reprimidos",
-        "Tipo de regulacion",
-        "Genes regulados"
-    ]
-)
-
-
-# Ordenar el DataFrame por el número total de genes regulados
-df_regulon = df_regulon.sort_values("Total genes regulados", ascending=False)
-
-
-# Guardar el resumen en un archivo CSV
-df_regulon.to_csv("results/regulon_summary.csv", index=False)
-
-print("\nResumen de regulones generado exitosamente. Ver results/regulon_summary.csv para detalles.")
+if __name__ == "__main__":
+    main()
