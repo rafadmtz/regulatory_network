@@ -131,6 +131,18 @@ def calcular_resumen_regulon(regulon_df, transcription_factors, min_genes):
     return tabla_resumen
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Procesa regulones")
+    parser.add_argument("input_file", help="Archivo de entrada, formato TSV")
+    parser.add_argument("output_file", help="Archivo de salida, formato CSV")
+    parser.add_argument("--min_genes", type=int, default=0, help="Número mínimo de genes regulados para incluir en el resumen")
+    
+    return parser.parse_args()
+    
+
+
+
+
 def main():
     
     """_summary_
@@ -138,12 +150,7 @@ def main():
     """
     
     #Crear un parser de argumentos para manejar la entrada y salida de archivos
-    parser = argparse.ArgumentParser(description="Procesa regulones")
-    parser.add_argument("input_file", help="Archivo de entrada, formato TSV")
-    parser.add_argument("output_file", help="Archivo de salida, formato CSV")
-    parser.add_argument("--min_genes", type=int, default=0, help="Número mínimo de genes regulados para incluir en el resumen")
-    
-    args = parser.parse_args()
+    args = parse_arguments()
     
     # Verificar si el archivo existe
     if not os.path.exists(args.input_file):
