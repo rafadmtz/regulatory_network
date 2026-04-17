@@ -430,3 +430,16 @@ AraC	2	1	1	Dual	araA, araB
 **Comportamiento esperado:**
 - si el diseño depende de índices fijos → probablemente falle
 - si usa nombres de columna → debería seguir funcionando
+
+
+# CLI — Filtro por número de genes
+
+### Caso: uso de --min_genes
+
+Entrada:
+python script.py input.tsv output.tsv --min_genes 2
+
+Resultado esperado:
+
+- Solo se incluyen TFs con al menos 2 genes
+- El archivo de salida refleja el filtrado correctamente

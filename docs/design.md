@@ -69,3 +69,22 @@ cerrar el archivo
 - **Índices fijos:** el programa usa posiciones fijas (columnas 2, 5 y 6) porque el formato del archivo de RegulonDB es estable y conocido. Esto simplifica el código, aunque lo hace dependiente del orden de columnas.
 - **Descartar vs. fallar:** las líneas inválidas se descartan silenciosamente para que el programa procese el mayor número de datos posible sin interrumpirse.
 - **Compatibilidad:** la lista `interactions` generada tiene el mismo formato que en las versiones anteriores: `[(TF, gen, efecto), ...]`. El resto del programa no requiere modificaciones.
+
+## Actualización v4
+
+El programa recibirá argumentos desde la línea de comandos.
+
+Flujo:
+
+usuario → CLI → main() → funciones
+
+
+## Actualización v5
+
+Se introduce un nuevo parámetro `--min_genes`.
+
+Diseño:
+
+- Después de construir el regulon, se debe aplicar un filtro
+- El filtro selecciona únicamente los TFs cuyo número de genes sea mayor o igual al valor indicado
+- El filtrado ocurre antes de generar la salida
