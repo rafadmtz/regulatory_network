@@ -1,17 +1,24 @@
 import pandas as pd
 import os
-import sys
 import argparse
 
 #Creae un archivo csv filtrado
 def convertir_tsv_a_csv(filename):
-    with open(filename) as f_in, \
-         open("data/NetworkRegulatorGene_clean.csv", "w") as f_out:
-        for line in f_in:
-            if not line.startswith("#"):
-                f_out.write(line.replace("\t", ","))
-
-
+    try:
+        with open(filename) as f_in, \
+             open("data/NetworkRegulatorGene_clean.csv", "w") as f_out:
+            for line in f_in:
+                if not line.startswith("#"):
+                    f_out.write(line.replace("\t", ","))
+    except FileNotFoundError:
+        print(f"Error: Archivo no encontrado - {filename}")
+        exit(1)
+    except PermissionError:
+        print(f"Error: Permiso denegado al procesar el archivo: {filename}")
+        exit(1)
+    except OSError as e:
+        print(f"Error al procesar el archivo: {e}")
+        exit(1)
 
 # Validar los datos y reportar cualquier inconsistencia
 
@@ -151,19 +158,18 @@ def main():
     
     #Crear un parser de argumentos para manejar la entrada y salida de archivos
     args = parse_arguments()
-    
-    # Verificar si el archivo existe
-    if not os.path.exists(args.input_file):
-        print(f"Error: archivo no encontrado {args.input_file}")
-        exit(1)
 
     # Crear el directorio de resultados si no existe"
     os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
-
+    
+    # Verificar si el archivo existe y pasar a csv
     convertir_tsv_a_csv(args.input_file)
 
-    # Cargar el archivo CSV filtrado
-    df = pd.read_csv("data/NetworkRegulatorGene_clean.csv")
+    try:
+        df = pd.read_csv("data/NetworkRegulatorGene_clean.csv")
+    except pd.errors.EmptyDataError:
+        print("Error: el archivo CSV generado está vacío o no contiene columnas válidas.")
+        exit(1)
 
     # Seleccionar solo las columnas relevantes
     regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
