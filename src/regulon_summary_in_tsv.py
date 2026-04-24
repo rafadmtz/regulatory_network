@@ -142,7 +142,10 @@ def calcular_resumen_regulon(regulon_df, transcription_factors, min_genes):
         except Exception as e:
             print(f"Error procesando el TF '{tf}': {type(e).__name__}: {e}")
             continue
-
+    
+    if not tabla_resumen:
+        print("No se encontraron reguladores que cumplan con el criterio de filtrado.")
+        
     return tabla_resumen
 
 
