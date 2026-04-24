@@ -90,7 +90,11 @@ def validar_datos(regulon_df):
         )
 
         # Guardar la tabla de errores en un archivo CSV
-        errores_df.to_csv("results/regulon_errors.csv", index=False)
+        try:
+            os.makedirs("results", exist_ok=True)
+            errores_df.to_csv("results/regulon_errors.csv", index=False)
+        except (PermissionError, OSError) as e:
+            print(f"Error al escribir el archivo de errores: {e}")
 
     else:
         print("No se encontraron errores en los datos.")
@@ -108,32 +112,36 @@ def calcular_resumen_regulon(regulon_df, transcription_factors, min_genes):
     tabla_resumen = []
 
     for tf in transcription_factors:
-        tf_df = regulon_df[regulon_df["TF"] == tf]
+        try:
+            tf_df = regulon_df[regulon_df["TF"] == tf]
 
-        genes = tf_df["Gene"].unique().tolist()
-        
-        if(len(genes) >= min_genes):
-        
-            activated = (tf_df["Effect"] == "+").sum()
-            repressed  = (tf_df["Effect"] == "-").sum()
-            dual = (tf_df["Effect"] == "-+").sum()
-
-
-            if activated and repressed:
-                tipo = "Dual"
-            elif activated:
-                tipo = "Activator"
-            elif repressed:
-                tipo = "Repressor"
+            genes = tf_df["Gene"].unique().tolist()
             
-            tabla_resumen.append((
-                tf,
-                len(genes),
-                activated+dual,
-                repressed+dual,
-                tipo,
-                genes
-            ))
+            if(len(genes) >= min_genes):
+            
+                activated = (tf_df["Effect"] == "+").sum()
+                repressed  = (tf_df["Effect"] == "-").sum()
+                dual = (tf_df["Effect"] == "-+").sum()
+
+
+                if activated and repressed:
+                    tipo = "Dual"
+                elif activated:
+                    tipo = "Activator"
+                elif repressed:
+                    tipo = "Repressor"
+                
+                tabla_resumen.append((
+                    tf,
+                    len(genes),
+                    activated+dual,
+                    repressed+dual,
+                    tipo,
+                    genes
+                ))
+        except Exception as e:
+            print(f"Error procesando el TF '{tf}': {type(e).__name__}: {e}")
+            continue
 
     return tabla_resumen
 
@@ -144,9 +152,12 @@ def parse_arguments():
     parser.add_argument("output_file", help="Archivo de salida, formato CSV")
     parser.add_argument("--min_genes", type=int, default=0, help="Número mínimo de genes regulados para incluir en el resumen")
     
-    return parser.parse_args()
+    try:
+        return parser.parse_args()
+    except SystemExit as e:
+        print(f"Error al parsear argumentos: {e}")
+        exit(1)
     
-
 
 
 
@@ -172,8 +183,12 @@ def main():
         exit(1)
 
     # Seleccionar solo las columnas relevantes
-    regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
-    regulon_df = regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
+    try:
+        regulon_df = df[["2)regulatorName", "5)regulatedName", "6)function"]]
+        regulon_df = regulon_df.rename(columns={"2)regulatorName": "TF", "5)regulatedName": "Gene", "6)function": "Effect"})
+    except KeyError as e:
+        print(f"Error: columna no encontrada en el archivo CSV: {e}")
+        exit(1)
 
     # Validar los datos y reportar cualquier inconsistencia mediante la funcion validar_datos
     validar_datos(regulon_df)
@@ -200,7 +215,11 @@ def main():
     df_regulon = df_regulon.sort_values("Total genes regulados", ascending=False)
 
     # Guardar el resumen en un archivo CSV
-    df_regulon.to_csv(args.output_file, index=False)
+    try:
+        df_regulon.to_csv(args.output_file, index=False)
+    except (PermissionError, FileNotFoundError, OSError) as e:
+        print(f"Error al escribir el archivo de salida '{args.output_file}': {e}")
+        exit(1)
 
     print(f"\nResumen de regulones generado exitosamente. Ver {args.output_file} para detalles.")
 
